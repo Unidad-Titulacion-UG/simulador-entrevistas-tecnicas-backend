@@ -13,6 +13,11 @@ class User(Base):
     email: Mapped[str] = mapped_column(String(255), unique=True, nullable=False)
     password_hash: Mapped[str] = mapped_column(String(255), nullable=False)
 
+    password_reset_token_hash: Mapped[str | None] = mapped_column(
+        String(64),
+        nullable=True,
+    )
+
     role: Mapped[str] = mapped_column(
         String(20),
         nullable=False,

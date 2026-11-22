@@ -1,5 +1,7 @@
 from sqlalchemy.orm import Session
-from app.core.security import hash_password
+from app.core.config import settings
+from app.core.email import create_email_html, send_email
+from app.core.security import create_email_verification_token, hash_password
 from app.modules.users import repository
 from app.modules.users.models import User
 from app.modules.users.schemas import UserCreate, UserUpdate
@@ -21,6 +23,41 @@ def create_user(db: Session, user_data: UserCreate) -> User:
 
     db.commit()
     db.refresh(user)
+
+    token = create_email_verification_token(user.id)
+
+    verification_url = (
+        f"{settings.FRONTEND_URL}/verify-email?token={token}"
+    )
+
+    send_email(
+        to_email=user.email,
+        subject="Confirma tu correo electrónico",
+        body=(
+            f"Hola, {user.name}:\n\n"
+            "Gracias por registrarte en Simulador de Entrevistas Técnicas.\n\n"
+            "Para confirmar tu dirección de correo electrónico, "
+            "ingresa al siguiente enlace:\n\n"
+            f"{verification_url}\n\n"
+            "Este enlace expirará en 24 horas.\n\n"
+            "Si no realizaste este registro, puedes ignorar este mensaje."
+        ),
+        html_body=create_email_html(
+            title="Confirma tu correo electrónico",
+            greeting=user.name,
+            message=(
+                "Gracias por registrarte. Confirma tu dirección de "
+                "correo electrónico para completar tu registro."
+            ),
+            button_text="Confirmar correo electrónico",
+            button_url=verification_url,
+            expiration="Este enlace expirará en 24 horas.",
+            notice=(
+                "Si no realizaste este registro, puedes ignorar "
+                "este mensaje."
+            ),
+        ),
+    )
 
     return user
 

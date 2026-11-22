@@ -3,6 +3,7 @@ from sqlalchemy import text
 from sqlalchemy.orm import Session
 from app.db.database import get_db
 from app.modules.users.router import router as users_router
+from app.modules.auth.router import router as auth_router
 
 router = APIRouter()
 
@@ -16,3 +17,4 @@ def health_check(db: Session = Depends(get_db)):
     }
 
 router.include_router(users_router)
+router.include_router(auth_router)

@@ -9,6 +9,11 @@ class Settings(BaseSettings):
 
     DATABASE_URL: str
     FRONTEND_URL: str
+    JWT_SECRET_KEY: str
+    JWT_ALGORITHM: str
+    ACCESS_TOKEN_EXPIRE_MINUTES: int
+    GMAIL_SENDER: str
+    GMAIL_SENDER_NAME: str
 
     model_config = SettingsConfigDict(
         env_file=".env",
